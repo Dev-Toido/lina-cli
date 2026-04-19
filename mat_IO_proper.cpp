@@ -41,7 +41,7 @@ public:
         for (int i = 0; i < m.nrow; i++)
         {
             os << "  | ";
-
+`
             for (int j = 0; j < m.ncol; j++)
             {
                 os << m.matx[i][j] << " ";
