@@ -58,6 +58,6 @@ int main()
     cout << "Enter the elements of the array: " << endl;
     cin >> m1;
     cout << m1;
-
+    Matrix m1(4,5);
     return 0;
 }
