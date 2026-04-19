@@ -1,5 +1,5 @@
 #include <iostream>
-#include <windows.h>
+
 using namespace std;
 
 class Matrix
@@ -41,7 +41,7 @@ public:
         for (int i = 0; i < m.nrow; i++)
         {
             os << "  | ";
-`
+
             for (int j = 0; j < m.ncol; j++)
             {
                 os << m.matx[i][j] << " ";
@@ -75,10 +75,7 @@ int main()
     cout << "Enter the elements of the array:\n";
     cin >> m1;
 
-    system("powershell -c \"Add-Type -AssemblyName System.Speech; \
-            $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer; \
-            $speak.Speak('Your Final Matrix is');\"");
-
+    
     cout << m1;
 
     return 0;
