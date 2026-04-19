@@ -23,7 +23,7 @@ public:
         {
             for (int j = 0; j < m.ncol; ++j)
             {
-                cout << "Element (" << i + 1 << "*" << j + 1 << "):";
+                cout << "Element (" << i + 1 << " * " << j + 1 << ") : ";
                 is >> m.matx[i][j]; // Read into matrix element
             }
         }
@@ -53,11 +53,15 @@ public:
 
 int main()
 {
-    Matrix m1(3, 3);
-    // Matrix m2(3,3);
+    int a;
+    int b;
+    cout << "Enter no of Row and Colume for your matrix in(a b)form : ";
+    cin >> a >> b;
+
+    Matrix m1(a,b);
     cout << "Enter the elements of the array: " << endl;
     cin >> m1;
     cout << m1;
-    Matrix m1(4,5);
+    
     return 0;
 }
