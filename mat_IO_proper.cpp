@@ -1,5 +1,4 @@
 #include <iostream>
-
 using namespace std;
 
 class Matrix
@@ -24,6 +23,7 @@ public:
 
         for (int i = 0; i < m.nrow; i++)
         {
+            cout << "Enter " << i + 1 << "st row : ";
             for (int j = 0; j < m.ncol; j++)
             {
                 is >> m.matx[i][j];
@@ -61,7 +61,6 @@ public:
 };
 int main()
 {
-    
 
     int a, b;
     char buf;
@@ -70,11 +69,7 @@ int main()
     cin >> a >> buf >> b;
 
     Matrix m1(a, b);
-
-    cout << "Enter the elements of the array:\n";
     cin >> m1;
-
-    
     cout << m1;
 
     return 0;
