@@ -1,5 +1,4 @@
 #include <iostream>
-
 using namespace std;
 
 class Matrix
@@ -9,12 +8,9 @@ private:
     int **matx;
 
 public:
-    // Constructor
     Matrix(int row, int col)
     {
-        nrow = row;
-        ncol = col;
-
+        nrow = row, ncol = col;
         matx = new int *[row];
         for (int i = 0; i < row; i++)
         {
@@ -22,13 +18,14 @@ public:
         }
     }
 
-    // Input Operator >>
+    // Input
     friend istream &operator>>(istream &is, Matrix &m)
     {
         cout << "Enter elements row wise:\n";
 
         for (int i = 0; i < m.nrow; i++)
         {
+            cout << "Enter " << i + 1 << " row : ";
             for (int j = 0; j < m.ncol; j++)
             {
                 is >> m.matx[i][j];
@@ -37,7 +34,7 @@ public:
         return is;
     }
 
-    // Output Operator <<
+    // Output
     friend ostream &operator<<(ostream &os, const Matrix &m)
     {
         cout << "_______________________" << endl;
@@ -58,10 +55,9 @@ public:
         return os;
     }
 
-    //  Addition Operator
+    // 🔥 Addition Operator
     Matrix operator+(const Matrix &m)
     {
-        // Check dimension
         if (nrow != m.nrow || ncol != m.ncol)
         {
             cout << "Matrix addition not possible!\n";
@@ -103,13 +99,14 @@ int main()
     Matrix m1(a, b);
     Matrix m2(a, b);
 
-    cout << "\nEnter elements of Matrix 1:\n";
+    cout << "\nMatrix 1:\n";
     cin >> m1;
 
-    cout << "\nEnter elements of Matrix 2:\n";
+    cout << "\nMatrix 2:\n";
     cin >> m2;
 
-    //  Addition
+    // addition
+
     Matrix sum = m1 + m2;
 
     cout << "\nResult Matrix (Addition):\n";

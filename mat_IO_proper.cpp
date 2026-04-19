@@ -71,6 +71,6 @@ int main()
     Matrix m1(a, b);
     cin >> m1;
     cout << m1;
-
+    
     return 0;
 }
