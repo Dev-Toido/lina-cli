@@ -55,7 +55,7 @@ public:
         return os;
     }
 
-    // Addition.  add by nitish
+    // 🔥 Addition
     Matrix operator+(const Matrix &m)
     {
         if (nrow != m.nrow || ncol != m.ncol)
@@ -77,7 +77,7 @@ public:
         return result;
     }
 
-    // Subtraction.  add by  nitish
+    //  Subtraction
     Matrix operator-(const Matrix &m)
     {
         if (nrow != m.nrow || ncol != m.ncol)
@@ -93,6 +93,22 @@ public:
             for (int j = 0; j < ncol; j++)
             {
                 result.matx[i][j] = matx[i][j] - m.matx[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    //  Scalar Multiplication
+    Matrix operator*(int scalar)
+    {
+        Matrix result(nrow, ncol);
+
+        for (int i = 0; i < nrow; i++)
+        {
+            for (int j = 0; j < ncol; j++)
+            {
+                result.matx[i][j] = matx[i][j] * scalar;
             }
         }
 
@@ -127,15 +143,24 @@ int main()
     cout << "\nMatrix 2:\n";
     cin >> m2;
 
-    // Addition
+    //  here Addition
     Matrix sum = m1 + m2;
     cout << "\nAddition Result:\n";
     cout << sum;
 
-    // Subtraction
+    //  here Subtraction
     Matrix diff = m1 - m2;
     cout << "\nSubtraction Result:\n";
     cout << diff;
+
+    //  here Scalar Multiplication
+    int s;
+    cout << "\nEnter scalar value: ";
+    cin >> s;
+
+    Matrix scaled = m1 * s;
+    cout << "\nScalar Multiplication Result:\n";
+    cout << scaled;
 
     return 0;
 }
