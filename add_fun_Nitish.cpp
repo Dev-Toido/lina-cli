@@ -55,7 +55,7 @@ public:
         return os;
     }
 
-    // Addition Operator
+    // Addition.  add by nitish
     Matrix operator+(const Matrix &m)
     {
         if (nrow != m.nrow || ncol != m.ncol)
@@ -77,8 +77,29 @@ public:
         return result;
     }
 
+    // Subtraction.  add by  nitish
+    Matrix operator-(const Matrix &m)
+    {
+        if (nrow != m.nrow || ncol != m.ncol)
+        {
+            cout << "Matrix subtraction not possible!\n";
+            exit(0);
+        }
+
+        Matrix result(nrow, ncol);
+
+        for (int i = 0; i < nrow; i++)
+        {
+            for (int j = 0; j < ncol; j++)
+            {
+                result.matx[i][j] = matx[i][j] - m.matx[i][j];
+            }
+        }
+
+        return result;
+    }
+
     // Destructor
-    
     ~Matrix()
     {
         for (int i = 0; i < nrow; ++i)
@@ -106,12 +127,15 @@ int main()
     cout << "\nMatrix 2:\n";
     cin >> m2;
 
-    // addition
-
+    // Addition
     Matrix sum = m1 + m2;
-
-    cout << "\nResult Matrix (Addition):\n";
+    cout << "\nAddition Result:\n";
     cout << sum;
+
+    // Subtraction
+    Matrix diff = m1 - m2;
+    cout << "\nSubtraction Result:\n";
+    cout << diff;
 
     return 0;
 }
