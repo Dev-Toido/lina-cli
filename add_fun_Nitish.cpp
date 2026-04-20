@@ -25,7 +25,7 @@ public:
 
         for (int i = 0; i < m.nrow; i++)
         {
-            cout << "Enter " << i + 1 << " row : ";
+            cout << "Enter row " << i + 1 << " : ";
             for (int j = 0; j < m.ncol; j++)
             {
                 is >> m.matx[i][j];
@@ -37,10 +37,10 @@ public:
     // Output
     friend ostream &operator<<(ostream &os, const Matrix &m)
     {
-        cout << "_______________________" << endl;
-        cout << "| Your Final Matrix   |" << endl;
-        cout << "***********************" << endl;
-        cout << endl;
+        os << "_______________________" << endl;
+        os << "| Your Final Matrix   |" << endl;
+        os << "***********************" << endl;
+        os << endl;
 
         for (int i = 0; i < m.nrow; i++)
         {
@@ -55,7 +55,7 @@ public:
         return os;
     }
 
-    // 🔥 Addition
+    // Addition
     Matrix operator+(const Matrix &m)
     {
         if (nrow != m.nrow || ncol != m.ncol)
@@ -77,7 +77,7 @@ public:
         return result;
     }
 
-    //  Subtraction
+    // Subtraction
     Matrix operator-(const Matrix &m)
     {
         if (nrow != m.nrow || ncol != m.ncol)
@@ -99,7 +99,7 @@ public:
         return result;
     }
 
-    //  Scalar Multiplication
+    // Scalar Multiplication (m1 * s)
     Matrix operator*(int scalar)
     {
         Matrix result(nrow, ncol);
@@ -109,6 +109,22 @@ public:
             for (int j = 0; j < ncol; j++)
             {
                 result.matx[i][j] = matx[i][j] * scalar;
+            }
+        }
+
+        return result;
+    }
+
+    // Scalar Multiplication (s * m1)
+    friend Matrix operator*(int scalar, const Matrix &m)
+    {
+        Matrix result(m.nrow, m.ncol);
+
+        for (int i = 0; i < m.nrow; i++)
+        {
+            for (int j = 0; j < m.ncol; j++)
+            {
+                result.matx[i][j] = m.matx[i][j] * scalar;
             }
         }
 
@@ -143,24 +159,28 @@ int main()
     cout << "\nMatrix 2:\n";
     cin >> m2;
 
-    //  here Addition
+    // Addition
     Matrix sum = m1 + m2;
     cout << "\nAddition Result:\n";
     cout << sum;
 
-    //  here Subtraction
+    // Subtraction
     Matrix diff = m1 - m2;
     cout << "\nSubtraction Result:\n";
     cout << diff;
 
-    //  here Scalar Multiplication
+    // Scalar Multiplication
     int s;
     cout << "\nEnter scalar value: ";
     cin >> s;
 
-    Matrix scaled = m1 * s;
-    cout << "\nScalar Multiplication Result:\n";
-    cout << scaled;
+    Matrix scaled1 = m1 * s;
+    cout << "\nResult (m1 * s):\n";
+    cout << scaled1;
+
+    Matrix scaled2 = s * m1;
+    cout << "\nResult (s * m1):\n";
+    cout << scaled2;
 
     return 0;
 }
