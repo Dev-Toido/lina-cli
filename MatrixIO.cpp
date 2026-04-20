@@ -58,10 +58,10 @@ int main()
     cout << "Enter no of Row and Colume for your matrix in(a b)form : ";
     cin >> a >> b;
 
-    Matrix m1(a,b);
+    Matrix m1(a, b);
     cout << "Enter the elements of the array: " << endl;
     cin >> m1;
     cout << m1;
-    
+
     return 0;
 }
