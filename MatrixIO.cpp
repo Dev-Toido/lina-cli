@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <iomanip>
 using namespace std;
 
 class Matrix
@@ -17,36 +19,47 @@ public:
             matx[i] = new int[col];
         }
     }
+    // INPUT
     friend istream &operator>>(istream &is, Matrix &m)
     {
-        cout << "Enter elements row wise:\n";
+        cout << "\n+-----------------------------------+\n";
+        cout << "|   ENTER ELEMENTS ROW WISE         |\n";
+        cout << "+-----------------------------------+\n";
 
         for (int i = 0; i < m.nrow; i++)
         {
-            cout << "Enter " << i + 1 << "st row : ";
+            cout << " Row " << i + 1 << " : ";
             for (int j = 0; j < m.ncol; j++)
-            {
                 is >> m.matx[i][j];
-            }
         }
+
         return is;
     }
+
+    // OUTPUT
     friend ostream &operator<<(ostream &os, const Matrix &m)
     {
-        cout << "_______________________" << endl;
-        cout << "| Your Final Matrix   |" << endl;
-        cout << "***********************" << endl;
-        cout << "" << endl;
+        int width = 8;
+        int total = m.ncol * width + 3;
 
+        // 3. Middle Border
+        os << "+--" << setfill(' ') << setw(total-4) << "" << "--+" << endl
+           << setfill(' ');
+
+        // 4. Matrix Rows
         for (int i = 0; i < m.nrow; i++)
         {
-            os << "  | ";
+            os << "|";
             for (int j = 0; j < m.ncol; j++)
             {
-                os << m.matx[i][j] << " ";
+                os << setw(width) << m.matx[i][j];
             }
-            os << "|\n";
+            os << "   |" << endl;
         }
+
+        // 5. Bottom Border
+        os << "+--" << setfill(' ') << setw(total-4) << "" << "--+" << endl
+           << setfill(' ');
 
         return os;
     }
