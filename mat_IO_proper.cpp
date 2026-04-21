@@ -26,7 +26,6 @@ public:
         cout << "| \033[42m\033[30m ENTER ELEMENTS ROW WISE \033[0m         |\n";
         cout << "+-----------------------------------+\n";
 
-
         for (int i = 0; i < m.nrow; i++)
         {
             cout << " Row " << i + 1 << " : ";
@@ -55,7 +54,7 @@ public:
         cout << "FINAL MATRIX";
         for (int i = 0; i < titleSpace - 1; i++)
             cout << " ";
-        cout << "|\n";
+        cout << "  |\n";
 
         cout << "+";
         for (int i = 0; i < total; i++)
