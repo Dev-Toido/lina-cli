@@ -238,15 +238,15 @@ int main()
 
     // Better instructions
     cout << "\n\n\033[36m=========== MATRIX 1 INPUT ===========\033[0m\n";
-    cout << "👉 Size: " << r1 << " x " << c1 << endl;
-    cout << "👉 Enter elements ROW-WISE\n";
-    cout << "👉 Example: 1 2 3 4 ...\n";
+    cout << " Size: " << r1 << " x " << c1 << endl;
+    cout << " Enter elements ROW-WISE\n";
+    cout << " Example: 1 2 3 4 ...\n";
     cin >> m1;
 
     cout << "\n\n\033[36m=========== MATRIX 2 INPUT ===========\033[0m\n";
-    cout << "👉 Size: " << r2 << " x " << c2 << endl;
-    cout << "👉 Enter elements ROW-WISE\n";
-    cout << "👉 Example: 5 6 7 8 ...\n";
+    cout << " Size: " << r2 << " x " << c2 << endl;
+    cout << " Enter elements ROW-WISE\n";
+    cout << " Example: 5 6 7 8 ...\n";
     cin >> m2;
 
     int choice;
