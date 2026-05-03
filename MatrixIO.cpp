@@ -640,14 +640,14 @@ int main()
     int r1, c1, r2, c2;
     char ch;
 
-    cout << "\033[34m+=======================================+\033[0m\n";
-    cout << "\033[34m|        MATRIX OPERATION SYSTEM        |\033[0m\n";
-    cout << "\033[34m+=======================================+\033[0m\n";
+    cout << "\n\033[34m+=======================================================+\033[0m\n";
+    cout << "\033[34m|\033[0m" << BOLD << CYAN << "             LINA-CLI: MATRIX OPERATION SYSTEM         " << RESET << "\033[34m|\033[0m\n";
+    cout << "\033[34m+=======================================================+\033[0m\n";
 
     cout << "\n Enter size of MATRIX 1 (row,col) : ";
     cin >> r1 >> ch >> c1;
 
-    cout << "\n Enter size of MATRIX 2 (row,col) : ";
+    cout << " Enter size of MATRIX 2 (row,col) : ";
     cin >> r2 >> ch >> c2;
 
     // Using 'double' automatically fixes your REF division truncation!
@@ -669,16 +669,18 @@ int main()
 
     do
     {
-        cout << "\n\n========= MENU =========\n";
+        cout << "\n\n"
+             << BOLD << "========= MAIN MENU =========" << RESET << "\n";
         cout << "1. Addition\n";
         cout << "2. Subtraction\n";
         cout << "3. Scalar Multiplication\n";
         cout << "4. Matrix Multiplication\n";
         cout << "5. Transpose (m1/m2)\n";
         cout << "6. Row Echelon Form (m1/m2)\n";
-        cout << "7. Exit\n";
-        cout << "8. Solve Linear Systems\n";
-        cout << "9. Matrix Transformation\n";
+        cout << "7. Solve Linear Systems (Ax = B)\n";
+        cout << "8. Matrix Transformation (2D Pipeline)\n";
+        cout << RED << "9. Exit\n"
+             << RESET;
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -732,7 +734,7 @@ int main()
         {
             if (c1 != r2)
             {
-                cout << RED << "Multiplication not possible!\n"
+                cout << RED << "Multiplication not possible! (m1 columns must equal m2 rows)\n"
                      << RESET;
                 break;
             }
@@ -746,7 +748,7 @@ int main()
         case 5:
         {
             int tchoice;
-            cout << "\nTranspose kis matrix ka karna hai?\n";
+            cout << "\nTranspose which matrix?\n";
             cout << "1. Matrix 1\n";
             cout << "2. Matrix 2\n";
             cout << "Enter choice: ";
@@ -765,14 +767,15 @@ int main()
                 cout << t;
             }
             else
-                cout << "Invalid choice!\n";
+                cout << RED << "Invalid choice!\n"
+                     << RESET;
             break;
         }
 
         case 6:
         {
             int rchoice;
-            cout << "\nREF kis matrix ka nikalna hai?\n";
+            cout << "\nFind REF for which matrix?\n";
             cout << "1. Matrix 1\n";
             cout << "2. Matrix 2\n";
             cout << "Enter choice: ";
@@ -780,7 +783,7 @@ int main()
 
             if (rchoice == 1)
             {
-                Matrix<double> temp = m1; // Deep copy thanks to the new Assignment Operator!
+                Matrix<double> temp = m1;
                 temp.ref();
                 cout << "\n***** REF OF MATRIX 1 *****";
                 cout << temp;
@@ -793,73 +796,110 @@ int main()
                 cout << temp;
             }
             else
-                cout << "Invalid choice!\n";
+                cout << RED << "Invalid choice!\n"
+                     << RESET;
             break;
         }
 
         case 7:
-            cout << "Exiting...\n";
-            break;
-        case 8:
         {
-            cout << "\nSolving A*x = B";
-            cout << "\nMatrix 1 (m1) will be 'A' and you need to input Vector 'B'.\n";
+            cout << "\n\033[35m=== SOLVE LINEAR SYSTEM (A*x = B) ===\033[0m\n";
+            cout << "Matrix 1 (m1) will be used as the coefficient matrix 'A'.\n";
 
-            Vector<double> B(r1); // Create vector B with same number of rows as A
+            Vector<double> B(r1);
             cout << "Enter the constants for Vector B (" << r1 << " elements):\n";
-            cin >> B; // Uses your inherited input operator!
+            cin >> B;
 
             Vector<double> solution = m1.solveSystem(B);
 
             if (solution.getrow() > 0)
-            { // If a solution exists
-                cout << "\n********** SOLUTION VECTOR (x) **********";
+            {
+                cout << GREEN << "\n********** SOLUTION VECTOR (x) **********" << RESET;
                 cout << solution;
             }
             break;
         }
-        case 9:
+
+        case 8:
         {
             cout << "\n\033[35m=== 2D TRANSFORMATION PIPELINE ===\033[0m\n";
 
-            // 1. Create a 2D Coordinate Vector [2, 1]
             Vector<double> point(2);
-            point[0] = 2.0; // X
-            point[1] = 1.0; // Y
+            cout << "Enter the X coordinate: ";
+            cin >> point[0];
+            cout << "Enter the Y coordinate: ";
+            cin >> point[1];
 
-            cout << "Original Coordinate:";
-            cout << point;
-
-            // 2. Initialize the Pipeline (for 2D)
             TransformPipeline<double> pipe(2);
+            int pipeChoice;
 
-            // 3. Chain some transformations together
-            cout << "\n-> Adding Scale (x2, y2)...";
-            pipe.addScale(2.0, 2.0);
+            cout << "\n"
+                 << GREEN << "Target Vector created at (" << point[0] << ", " << point[1] << ")" << RESET << "\n";
 
-            cout << "\n-> Adding 90-degree Rotation...";
-            pipe.addRotation(90.0);
+            // Mini-menu for building the pipeline
+            do
+            {
+                cout << "\n--- Add Transformation ---\n";
+                cout << "1. Scale\n";
+                cout << "2. Rotate\n";
+                cout << "3. Reflect\n";
+                cout << "4. APPLY PIPELINE & VIEW RESULT\n";
+                cout << "Enter choice: ";
+                cin >> pipeChoice;
 
-            cout << "\n-> Adding Reflection across Y-axis...\n";
-            pipe.addReflection(false, true);
+                if (pipeChoice == 1)
+                {
+                    double sx, sy;
+                    cout << "Enter Scale X factor: ";
+                    cin >> sx;
+                    cout << "Enter Scale Y factor: ";
+                    cin >> sy;
+                    pipe.addScale(sx, sy);
+                    cout << YELLOW << "-> Scale added to pipeline.\n"
+                         << RESET;
+                }
+                else if (pipeChoice == 2)
+                {
+                    double angle;
+                    cout << "Enter Rotation Angle (degrees): ";
+                    cin >> angle;
+                    pipe.addRotation(angle);
+                    cout << YELLOW << "-> Rotation added to pipeline.\n"
+                         << RESET;
+                }
+                else if (pipeChoice == 3)
+                {
+                    int rx, ry;
+                    cout << "Reflect across X-axis? (1 for Yes, 0 for No): ";
+                    cin >> rx;
+                    cout << "Reflect across Y-axis? (1 for Yes, 0 for No): ";
+                    cin >> ry;
+                    pipe.addReflection(rx == 1, ry == 1);
+                    cout << YELLOW << "-> Reflection added to pipeline.\n"
+                         << RESET;
+                }
+            } while (pipeChoice != 4);
 
-            // You can view the master matrix that represents all 3 steps combined
             pipe.showPipelineMatrix();
 
-            // 4. Apply the pipeline to the vector!
             Vector<double> transformedPoint = pipe.apply(point);
 
-            cout << "\n********** FINAL TRANSFORMED COORDINATE **********";
+            cout << GREEN << "\n********** FINAL TRANSFORMED COORDINATE **********" << RESET;
             cout << transformedPoint;
-
             break;
         }
-        
+
+        case 9:
+            cout << CYAN << "\nExiting LINA-CLI... Goodbye!\n\n"
+                 << RESET;
+            break;
+
         default:
-            cout << "Invalid choice!\n";
+            cout << RED << "Invalid choice! Please select from the menu.\n"
+                 << RESET;
         }
 
-    } while (choice != 7);
+    } while (choice != 9);
 
     return 0;
 }
