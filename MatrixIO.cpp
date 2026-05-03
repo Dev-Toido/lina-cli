@@ -20,7 +20,7 @@ using namespace std;
 
 class Matrix
 {
-private:
+protected:
     int nrow, ncol;
     int **matx;
 
@@ -227,10 +227,84 @@ public:
 };
 
 // VECTOR CLASS (INHERITANCE)
+#include <cmath> // Required for std::sqrt()
+
 class Vector : public Matrix
 {
 public:
-    Vector(int n) : Matrix(n, 1) {}
+    // 1. Standard Constructor: A Vector is an 'n' by 1 Matrix (Column Vector)
+    Vector(int size = 0) : Matrix(size, 1) {}
+
+    // 2. Conversion Constructor: 
+    // Since Vector + Vector uses Matrix::operator+, it returns a Matrix.
+    // This allows C++ to seamlessly convert that resulting Matrix back into a Vector.
+    Vector(const Matrix &m) : Matrix(m)
+    {
+        if (this->ncol != 1 && this->nrow > 0)
+        {
+            cout << "Warning: Converting an N x M matrix into a vector!\n";
+        }
+    }
+
+    // 3. Easy Access Operator:
+    // Instead of typing v.matx[2][0], you can just type v[2]
+    int& operator[](int index)
+    {
+        return matx[index][0];
+    }
+
+    // Read-only version for const Vectors
+    int operator[](int index) const
+    {
+        return matx[index][0];
+    }
+
+    // 4. Vector Magnitude (Length)
+    // Formula: sqrt(x^2 + y^2 + z^2 ...)
+    double magnitude() const
+    {
+        double sum = 0;
+        for (int i = 0; i < nrow; ++i)
+        {
+            sum += matx[i][0] * matx[i][0];
+        }
+        return std::sqrt(sum);
+    }
+
+    // 5. Dot Product (v1 • v2)
+    int dot(const Vector &v) const
+    {
+        if (this->nrow != v.nrow)
+        {
+            cout << "Dot product failed: Vectors must be the same dimension!\n";
+            return 0;
+        }
+
+        int result = 0;
+        for (int i = 0; i < nrow; ++i)
+        {
+            result += this->matx[i][0] * v.matx[i][0];
+        }
+        return result;
+    }
+
+    // 6. Cross Product (v1 x v2)
+    // Mathematically, the cross product is strictly defined for 3D vectors.
+    Vector cross(const Vector &v) const
+    {
+        if (this->nrow != 3 || v.nrow != 3)
+        {
+            cout << "Cross product failed: Only defined for 3D vectors!\n";
+            return Vector(0); // Return empty vector on failure
+        }
+
+        Vector result(3);
+        result[0] = this->matx[1][0] * v.matx[2][0] - this->matx[2][0] * v.matx[1][0]; // yz - zy
+        result[1] = this->matx[2][0] * v.matx[0][0] - this->matx[0][0] * v.matx[2][0]; // zx - xz
+        result[2] = this->matx[0][0] * v.matx[1][0] - this->matx[1][0] * v.matx[0][0]; // xy - yx
+        
+        return result;
+    }
 };
 
 int main()
