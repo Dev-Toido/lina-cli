@@ -83,7 +83,7 @@ public:
         int titleSpace = (total - 12) / 2;
         for (int i = 0; i < titleSpace; i++)
             cout << " ";
-        cout << "FINAL MATRIX";
+        cout << GREEN"FINAL MATRIX"<<RESET;
         for (int i = 0; i < titleSpace - 1; i++)
             cout << " ";
         cout << "  |\n";
@@ -243,7 +243,7 @@ int main()
     cout << "\033[34m+=======================================+\033[0m\n";
 
     // Separate size input
-    cout << "\n Enter size of MATRIX 1 (row,col) : ";
+    cout << "\n Enter size of MATRIX 1 ("<<GREEN<<"row,col"<<RESET") : ";
     cin >> r1 >> ch >> c1;
 
     cout << "\n Enter size of MATRIX 2 (row,col) : ";
@@ -374,7 +374,7 @@ int main()
         case 6:
         {
             int rchoice;
-            cout << "\nREF kis matrix ka nikalna hai?\n";
+            cout << "\nFOR WHICH MATRIX REF ! YOU WANT?\n";
             cout << "1. Matrix 1\n";
             cout << "2. Matrix 2\n";
             cout << "Enter choice: ";
