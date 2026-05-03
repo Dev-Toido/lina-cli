@@ -20,7 +20,7 @@ public:
         for (int i = 0; i < nrow; i++)
             matx[i] = new int[ncol];
     }
-// COPY CONSTRUCTOR (Deep Copy - Silent Fix)
+// COPY CONSTRUCTOR (Deep Copy)
 Matrix(const Matrix &m)
 {
     nrow = m.nrow;
@@ -142,7 +142,7 @@ Matrix(const Matrix &m)
         return result;
     }
 
-    // 🔥 MATRIX MULTIPLICATION
+    // MATRIX MULTIPLICATION
     Matrix operator*(const Matrix &m)
     {
         Matrix result(nrow, m.ncol);
@@ -161,7 +161,7 @@ Matrix(const Matrix &m)
         return result;
     }
 
-    // 🔥 TRANSPOSE
+    // TRANSPOSE
     Matrix transpose()
     {
         Matrix t(ncol, nrow);
@@ -173,7 +173,7 @@ Matrix(const Matrix &m)
         return t;
     }
 
-    // 🔥 ROW ECHELON FORM
+    // ROW ECHELON FORM
     void REF()
     {
         for (int i = 0; i < nrow; i++)
@@ -211,7 +211,7 @@ Matrix(const Matrix &m)
     }
 };
 
-// 🔥 VECTOR CLASS (INHERITANCE)
+// VECTOR CLASS (INHERITANCE)
 class Vector : public Matrix
 {
 public:
@@ -227,7 +227,7 @@ int main()
     cout << "\033[34m|        MATRIX OPERATION SYSTEM        |\033[0m\n";
     cout << "\033[34m+=======================================+\033[0m\n";
 
-    // ✅ Separate size input
+    // Separate size input
     cout << "\n Enter size of MATRIX 1 (row,col) : ";
     cin >> r1 >> ch >> c1;
 
@@ -236,7 +236,7 @@ int main()
 
     Matrix m1(r1, c1), m2(r2, c2);
 
-    // ✅ Better instructions
+    // Better instructions
     cout << "\n\n\033[36m=========== MATRIX 1 INPUT ===========\033[0m\n";
     cout << "👉 Size: " << r1 << " x " << c1 << endl;
     cout << "👉 Enter elements ROW-WISE\n";
@@ -310,7 +310,7 @@ int main()
 
         case 4:
         {
-            // ✅ FIXED CONDITION
+            //FIXED CONDITION
             if (c1 != r2)
             {
                 cout << "Multiplication not possible!\n";
@@ -355,7 +355,7 @@ int main()
 
         case 6:
         {
-            Matrix temp = m1; // now safe (copy constructor used)
+            Matrix temp = m1; // (copy constructor used)
             temp.REF();
             cout << "\n***** ROW ECHELON FORM *****";
             cout << temp;
