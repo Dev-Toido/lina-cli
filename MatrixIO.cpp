@@ -13,7 +13,9 @@ using namespace std;
 #define CYAN "\033[36m"
 #define WHITE "\033[37m"
 
+// ==========================================
 // TEMPLATE MATRIX CLASS
+// ==========================================
 template <typename T>
 class Matrix
 {
@@ -66,13 +68,12 @@ public:
         }
     }
 
-    // COPY ASSIGNMENT OPERATOR (Crucial for avoiding crashes with temp matrices)
+    // COPY ASSIGNMENT OPERATOR
     Matrix<T> &operator=(const Matrix<T> &m)
     {
         if (this == &m)
-            return *this; // Protect against self-assignment
+            return *this;
 
-        // 1. Delete old memory
         if (matx != nullptr)
         {
             for (int i = 0; i < nrow; i++)
@@ -80,7 +81,6 @@ public:
             delete[] matx;
         }
 
-        // 2. Copy new data
         nrow = m.nrow;
         ncol = m.ncol;
         if (nrow > 0 && ncol > 0)
@@ -133,42 +133,60 @@ public:
     friend ostream &operator<<(ostream &os, const Matrix<T> &m)
     {
         if (m.nrow == 0 || m.ncol == 0)
-            return os; // Safeguard
+            return os;
 
         int width = 8;
-        int total = m.ncol * width + 3;
+        
+        // Calculate the required inner width (1 space left padding + data + 1 space right padding)
+        int total = (m.ncol * width) + 2;
 
-        cout << "\n+";
-        for (int i = 0; i < total; i++)
-            cout << "-";
-        cout << "+\n";
-
-        cout << "|";
-        int titleSpace = (total - 12) / 2;
-        for (int i = 0; i < titleSpace; i++)
-            cout << " ";
-        cout << "FINAL MATRIX";
-        for (int i = 0; i < titleSpace - 1; i++)
-            cout << " ";
-        cout << "  |\n";
-
-        cout << "+";
-        for (int i = 0; i < total; i++)
-            cout << "-";
-        cout << "+\n";
-
-        for (int i = 0; i < m.nrow; i++)
-        {
-            cout << "|";
-            for (int j = 0; j < m.ncol; j++)
-                cout << setw(width) << m.matx[i][j];
-            cout << "   |\n";
+        // Ensure the box is at least wide enough to fit the "FINAL MATRIX" title (12 chars)
+        if (total < 14) {
+            total = 14; 
         }
 
-        cout << "+";
-        for (int i = 0; i < total; i++)
-            cout << "-";
-        cout << "+\n";
+        // 1. Top Border
+        os << "\n+";
+        for (int i = 0; i < total; i++) os << "-";
+        os << "+\n";
+
+        // 2. Title Row (Calculates left/right spaces mathematically to prevent odd/even bugs)
+        os << "|";
+        int leftSpace = (total - 12) / 2;
+        int rightSpace = total - 12 - leftSpace; 
+        
+        for (int i = 0; i < leftSpace; i++) os << " ";
+        os << "FINAL MATRIX";
+        for (int i = 0; i < rightSpace; i++) os << " ";
+        os << "|\n";
+
+        // 3. Middle Border
+        os << "+";
+        for (int i = 0; i < total; i++) os << "-";
+        os << "+\n";
+
+        // 4. Data Rows
+        for (int i = 0; i < m.nrow; i++)
+        {
+            os << "| "; // Left padding (1 space)
+            
+            for (int j = 0; j < m.ncol; j++)
+            {
+                os << setw(width) << m.matx[i][j];
+            }
+            
+            // Fill any remaining space on the right side 
+            // (Crucial for 1x1 matrices where the title is wider than the data)
+            int remainingSpace = total - (m.ncol * width) - 1;
+            for (int j = 0; j < remainingSpace; j++) os << " ";
+            
+            os << "|\n";
+        }
+
+        // 5. Bottom Border
+        os << "+";
+        for (int i = 0; i < total; i++) os << "-";
+        os << "+\n";
 
         return os;
     }
@@ -241,15 +259,13 @@ public:
         return t;
     }
 
-    // ROW ECHELON FORM (No algorithm library used)
+    // ROW ECHELON FORM
     void ref()
     {
-        // Custom min logic
         int limit = (nrow < ncol) ? nrow : ncol;
 
         for (int i = 0; i < limit; i++)
         {
-            // Custom absolute value logic for pivot check to handle floats
             T pivot = (matx[i][i] < 0) ? -matx[i][i] : matx[i][i];
 
             if (pivot < 1e-9)
@@ -259,7 +275,6 @@ public:
                     T check = (matx[k][i] < 0) ? -matx[k][i] : matx[k][i];
                     if (check > 1e-9)
                     {
-                        // Custom pointer swap (much faster than std::swap)
                         T *tempRow = matx[i];
                         matx[i] = matx[k];
                         matx[k] = tempRow;
@@ -329,40 +344,38 @@ public:
         }
         return det;
     }
+
     // GAUSSIAN ELIMINATION SOLVER (Ax = B)
-    // Takes a Vector B of constants, returns a Vector x of solutions.
-    Vector<double> solveSystem(const Vector<T> &B) const
+    // FIX 1: Accepts Matrix<T> instead of Vector, returns Matrix<double>
+    Matrix<double> solveSystem(const Matrix<T> &B) const
     {
         if (nrow != ncol)
         {
             cout << RED << "Error: System must be square (n equations with n variables)!\n"
                  << RESET;
-            return Vector<double>(0);
+            return Matrix<double>(0, 0);
         }
         if (nrow != B.nrow)
         {
             cout << RED << "Error: Dimension mismatch between Matrix A and Vector B!\n"
                  << RESET;
-            return Vector<double>(0);
+            return Matrix<double>(0, 0);
         }
 
-        // 1. Create an Augmented Matrix [A | B] using doubles to prevent division truncation
         int n = nrow;
         double **aug = new double *[n];
         for (int i = 0; i < n; i++)
         {
-            aug[i] = new double[n + 1]; // +1 column for the B vector
+            aug[i] = new double[n + 1];
             for (int j = 0; j < n; j++)
             {
                 aug[i][j] = (double)matx[i][j];
             }
-            aug[i][n] = (double)B[i]; // Append B to the end
+            aug[i][n] = (double)B.matx[i][0]; // Extract B directly from the Matrix
         }
 
-        // 2. Forward Elimination (Your REF logic adapted for the augmented matrix)
         for (int i = 0; i < n; i++)
         {
-            // Find pivot
             if (std::abs(aug[i][i]) < 1e-9)
             {
                 for (int k = i + 1; k < n; k++)
@@ -377,7 +390,6 @@ public:
                 }
             }
 
-            // Check if singular (no unique solution)
             if (std::abs(aug[i][i]) < 1e-9)
             {
                 cout << YELLOW << "Warning: Matrix is singular. System has no unique solution.\n"
@@ -385,44 +397,40 @@ public:
                 for (int r = 0; r < n; r++)
                     delete[] aug[r];
                 delete[] aug;
-                return Vector<double>(0);
+                return Matrix<double>(0, 0);
             }
 
-            // Eliminate
             for (int k = i + 1; k < n; k++)
             {
                 double factor = aug[k][i] / aug[i][i];
                 for (int j = i; j <= n; j++)
-                { // Notice j <= n to include the augmented column
+                {
                     aug[k][j] -= factor * aug[i][j];
                 }
             }
         }
 
-        // 3. Back Substitution
-        Vector<double> solution(n);
+        Matrix<double> solution(n, 1);
         for (int i = n - 1; i >= 0; i--)
         {
-            solution[i] = aug[i][n]; // Start with the augmented column value
+            solution.matx[i][0] = aug[i][n];
             for (int j = i + 1; j < n; j++)
             {
-                solution[i] -= aug[i][j] * solution[j]; // Subtract the known variables
+                solution.matx[i][0] -= aug[i][j] * solution.matx[j][0];
             }
-            solution[i] /= aug[i][i]; // Divide by the pivot
+            solution.matx[i][0] /= aug[i][i];
         }
 
-        // 4. Cleanup Memory
         for (int i = 0; i < n; i++)
             delete[] aug[i];
         delete[] aug;
 
         return solution;
     }
+
     // ==========================================
     // TRANSFORMATION MATRIX GENERATORS (2D Space)
     // ==========================================
-
-    // Generates an Identity Matrix (1s on the diagonal, 0s elsewhere)
     static Matrix<T> Identity(int size)
     {
         Matrix<T> I(size, size);
@@ -433,7 +441,6 @@ public:
         return I;
     }
 
-    // SCALING MATRIX
     static Matrix<T> Scale2D(T scaleX, T scaleY)
     {
         Matrix<T> S = Identity(2);
@@ -442,27 +449,22 @@ public:
         return S;
     }
 
-    // REFLECTION MATRIX
     static Matrix<T> Reflect2D(bool acrossXAxis, bool acrossYAxis)
     {
         Matrix<T> R = Identity(2);
         if (acrossXAxis)
-            R.matx[1][1] = -1; // Invert Y coordinates
+            R.matx[1][1] = -1;
         if (acrossYAxis)
-            R.matx[0][0] = -1; // Invert X coordinates
+            R.matx[0][0] = -1;
         return R;
     }
 
-    // ROTATION MATRIX (Counter-Clockwise)
     static Matrix<T> Rotate2D(double angleDegrees)
     {
         Matrix<T> R = Identity(2);
         const double PI = 3.14159265358979323846;
         double radians = angleDegrees * PI / 180.0;
 
-        // 2D Rotation Formula:
-        // [ cos(θ)  -sin(θ) ]
-        // [ sin(θ)   cos(θ) ]
         R.matx[0][0] = (T)std::cos(radians);
         R.matx[0][1] = (T)-std::sin(radians);
         R.matx[1][0] = (T)std::sin(radians);
@@ -471,7 +473,9 @@ public:
     }
 };
 
+// ==========================================
 // TEMPLATE VECTOR CLASS (INHERITANCE)
+// ==========================================
 template <typename T>
 class Vector : public Matrix<T>
 {
@@ -486,11 +490,13 @@ public:
                  << RESET;
         }
     }
-    int getrow() { return nrow; }
+
+    // FIX 2: Added const and this->
+    int getrow() const { return this->nrow; }
+
     T &operator[](int index) { return this->matx[index][0]; }
     T operator[](int index) const { return this->matx[index][0]; }
 
-    // MAGNITUDE (Works in N-Dimensional Space)
     double magnitude() const
     {
         double sum = 0;
@@ -501,10 +507,8 @@ public:
         return std::sqrt(sum);
     }
 
-    // DOT PRODUCT (Works in N-Dimensional Space: 1D, 2D, 3D, 4D...)
     T dot(const Vector<T> &v) const
     {
-        // 1. Validate that both vectors exist in the same dimensional space
         if (this->nrow != v.nrow)
         {
             cout << RED << "\n[Math Error] Dot product failed: Vectors must be the exact same dimension!\n"
@@ -512,7 +516,6 @@ public:
             return 0;
         }
 
-        // 2. Compute N-Dimensional Dot Product
         T result = 0;
         for (int i = 0; i < this->nrow; ++i)
         {
@@ -521,7 +524,6 @@ public:
         return result;
     }
 
-    // CROSS PRODUCT (Strictly adapted for 2D and 3D Spaces)
     Vector<T> cross(const Vector<T> &v) const
     {
         if (this->nrow != v.nrow)
@@ -531,38 +533,31 @@ public:
             return Vector<T>(0);
         }
 
-        // --- 2D SPACE CROSS PRODUCT ---
-        // Returns a 1D Vector (which acts as a single scalar value representing the Z-axis magnitude)
         if (this->nrow == 2)
         {
             Vector<T> result(1);
-            result[0] = (this->matx[0][0] * v.matx[1][0]) - (this->matx[1][0] * v.matx[0][0]); // (x1*y2 - y1*x2)
-
+            result[0] = (this->matx[0][0] * v.matx[1][0]) - (this->matx[1][0] * v.matx[0][0]);
             cout << CYAN << "\n[Note] 2D Cross Product computed. Returning 1D scalar vector (Z-magnitude).\n"
                  << RESET;
             return result;
         }
-
-        // --- 3D SPACE CROSS PRODUCT ---
-        // Returns a standard orthogonal 3D Vector
         else if (this->nrow == 3)
         {
             Vector<T> result(3);
-            result[0] = this->matx[1][0] * v.matx[2][0] - this->matx[2][0] * v.matx[1][0]; // yz - zy
-            result[1] = this->matx[2][0] * v.matx[0][0] - this->matx[0][0] * v.matx[2][0]; // zx - xz
-            result[2] = this->matx[0][0] * v.matx[1][0] - this->matx[1][0] * v.matx[0][0]; // xy - yx
+            result[0] = this->matx[1][0] * v.matx[2][0] - this->matx[2][0] * v.matx[1][0];
+            result[1] = this->matx[2][0] * v.matx[0][0] - this->matx[0][0] * v.matx[2][0];
+            result[2] = this->matx[0][0] * v.matx[1][0] - this->matx[1][0] * v.matx[0][0];
             return result;
         }
-
-        // --- INVALID SPACES (1D, 4D, 5D, etc.) ---
         else
         {
             cout << RED << "\n[Math Error] Cross product is mathematically defined only for 2D and 3D vectors!\n"
                  << RESET;
-            return Vector<T>(0); // Return empty vector
+            return Vector<T>(0);
         }
     }
 };
+
 // ==========================================
 // TRANSFORMATION PIPELINE
 // ==========================================
@@ -574,27 +569,21 @@ private:
     int dimensions;
 
 public:
-    // Initialize pipeline with an Identity Matrix
     TransformPipeline(int dims) : dimensions(dims)
     {
         masterTransform = Matrix<T>::Identity(dims);
     }
 
-    // Reset the pipeline
     void reset()
     {
         masterTransform = Matrix<T>::Identity(dimensions);
     }
 
-    // View the current combined matrix
     void showPipelineMatrix() const
     {
         cout << "\n[ Current Master Transformation Matrix ]";
         cout << masterTransform;
     }
-
-    // --- Add Transformations ---
-    // Note: newTransform is placed on the LEFT of the multiplication!
 
     void addScale(T sx, T sy)
     {
@@ -620,52 +609,33 @@ public:
         }
     }
 
-    // --- Execution ---
-    // Applies the master matrix to a specific vector
     Vector<T> apply(const Vector<T> &targetVector) const
     {
-        if (targetVector.nrow != dimensions)
+        // FIX 3: Replaced .nrow with .getrow()
+        if (targetVector.getrow() != dimensions)
         {
             cout << "\nError: Vector dimension does not match pipeline dimension!\n";
             return Vector<T>(0);
         }
 
-        // Because Vector has a conversion constructor from Matrix,
-        // this Matrix * Vector multiplication safely returns a Vector!
         return masterTransform * targetVector;
     }
 };
+
+// ==========================================
+// MAIN FUNCTION
+// ==========================================
+// ==========================================
+// MAIN FUNCTION (Production CLI Flow)
+// ==========================================
 int main()
 {
-    int r1, c1, r2, c2;
-    char ch;
+    char ch; // Used to catch the comma in inputs like "2,2"
+    int choice;
 
     cout << "\n\033[34m+=======================================================+\033[0m\n";
     cout << "\033[34m|\033[0m" << BOLD << CYAN << "             LINA-CLI: MATRIX OPERATION SYSTEM         " << RESET << "\033[34m|\033[0m\n";
     cout << "\033[34m+=======================================================+\033[0m\n";
-
-    cout << "\n Enter size of MATRIX 1 (row,col) : ";
-    cin >> r1 >> ch >> c1;
-
-    cout << " Enter size of MATRIX 2 (row,col) : ";
-    cin >> r2 >> ch >> c2;
-
-    // Using 'double' automatically fixes your REF division truncation!
-    Matrix<double> m1(r1, c1), m2(r2, c2);
-
-    cout << "\n\n\033[36m=========== MATRIX 1 INPUT ===========\033[0m\n";
-    cout << " Size: " << r1 << " x " << c1 << endl;
-    cout << " Enter elements ROW-WISE\n";
-    cout << " Example: 1 2 3 4 ...\n";
-    cin >> m1;
-
-    cout << "\n\n\033[36m=========== MATRIX 2 INPUT ===========\033[0m\n";
-    cout << " Size: " << r2 << " x " << c2 << endl;
-    cout << " Enter elements ROW-WISE\n";
-    cout << " Example: 5 6 7 8 ...\n";
-    cin >> m2;
-
-    int choice;
 
     do
     {
@@ -675,142 +645,170 @@ int main()
         cout << "2. Subtraction\n";
         cout << "3. Scalar Multiplication\n";
         cout << "4. Matrix Multiplication\n";
-        cout << "5. Transpose (m1/m2)\n";
-        cout << "6. Row Echelon Form (m1/m2)\n";
+        cout << "5. Transpose\n";
+        cout << "6. Row Echelon Form (REF)\n";
         cout << "7. Solve Linear Systems (Ax = B)\n";
         cout << "8. Matrix Transformation (2D Pipeline)\n";
         cout << RED << "9. Exit\n"
              << RESET;
-        cout << "Enter choice: ";
+        cout << "Enter your preferred operation: ";
         cin >> choice;
 
         switch (choice)
         {
-        case 1:
+        case 1: // ADDITION
         {
+            int r1, c1, r2, c2;
+            cout << "\n\033[36m=== ADDITION ===\033[0m\n";
+            cout << "Size of Matrix A (row,col): ";
+            cin >> r1 >> ch >> c1;
+            cout << "Size of Matrix B (row,col): ";
+            cin >> r2 >> ch >> c2;
+
             if (r1 != r2 || c1 != c2)
             {
-                cout << RED << "Addition not possible (size mismatch)\n"
-                     << RESET;
-                break;
-            }
-            Matrix<double> sum = m1 + m2;
-            cout << "\n*********** ADDITION RESULT ***********";
-            cout << sum;
-            break;
-        }
-
-        case 2:
-        {
-            if (r1 != r2 || c1 != c2)
-            {
-                cout << RED << "Subtraction not possible (size mismatch)\n"
-                     << RESET;
-                break;
-            }
-            Matrix<double> diff = m1 - m2;
-            cout << "\n********* SUBTRACTION RESULT **********";
-            cout << diff;
-            break;
-        }
-
-        case 3:
-        {
-            double s;
-            cout << "Enter Scalar: ";
-            cin >> s;
-
-            Matrix<double> mul1 = m1 * s;
-            cout << "\nm1 * Scalar:";
-            cout << mul1;
-
-            Matrix<double> mul2 = s * m1;
-            cout << "\nScalar * m1:";
-            cout << mul2;
-            break;
-        }
-
-        case 4:
-        {
-            if (c1 != r2)
-            {
-                cout << RED << "Multiplication not possible! (m1 columns must equal m2 rows)\n"
+                cout << RED << "\n[Error] Addition requires matrices of the exact same size!\n"
                      << RESET;
                 break;
             }
 
-            Matrix<double> mul = m1 * m2;
-            cout << "\n***** MATRIX MULTIPLICATION RESULT *****";
-            cout << mul;
-            break;
-        }
-
-        case 5:
-        {
-            int tchoice;
-            cout << "\nTranspose which matrix?\n";
-            cout << "1. Matrix 1\n";
-            cout << "2. Matrix 2\n";
-            cout << "Enter choice: ";
-            cin >> tchoice;
-
-            if (tchoice == 1)
-            {
-                Matrix<double> t = m1.transpose();
-                cout << "\n******** TRANSPOSE OF MATRIX 1 ********";
-                cout << t;
-            }
-            else if (tchoice == 2)
-            {
-                Matrix<double> t = m2.transpose();
-                cout << "\n******** TRANSPOSE OF MATRIX 2 ********";
-                cout << t;
-            }
-            else
-                cout << RED << "Invalid choice!\n"
-                     << RESET;
-            break;
-        }
-
-        case 6:
-        {
-            int rchoice;
-            cout << "\nFind REF for which matrix?\n";
-            cout << "1. Matrix 1\n";
-            cout << "2. Matrix 2\n";
-            cout << "Enter choice: ";
-            cin >> rchoice;
-
-            if (rchoice == 1)
-            {
-                Matrix<double> temp = m1;
-                temp.ref();
-                cout << "\n***** REF OF MATRIX 1 *****";
-                cout << temp;
-            }
-            else if (rchoice == 2)
-            {
-                Matrix<double> temp = m2;
-                temp.ref();
-                cout << "\n***** REF OF MATRIX 2 *****";
-                cout << temp;
-            }
-            else
-                cout << RED << "Invalid choice!\n"
-                     << RESET;
-            break;
-        }
-
-        case 7:
-        {
-            cout << "\n\033[35m=== SOLVE LINEAR SYSTEM (A*x = B) ===\033[0m\n";
-            cout << "Matrix 1 (m1) will be used as the coefficient matrix 'A'.\n";
-
-            Vector<double> B(r1);
-            cout << "Enter the constants for Vector B (" << r1 << " elements):\n";
+            Matrix<double> A(r1, c1), B(r2, c2);
+            cout << "\nInput Matrix A:";
+            cin >> A;
+            cout << "\nInput Matrix B:";
             cin >> B;
 
-            Vector<double> solution = m1.solveSystem(B);
+            cout << GREEN << "\n*********** ADDITION RESULT ***********" << RESET;
+            cout << A + B;
+            break;
+        }
+
+        case 2: // SUBTRACTION
+        {
+            int r1, c1, r2, c2;
+            cout << "\n\033[36m=== SUBTRACTION ===\033[0m\n";
+            cout << "Size of Matrix A (row,col): ";
+            cin >> r1 >> ch >> c1;
+            cout << "Size of Matrix B (row,col): ";
+            cin >> r2 >> ch >> c2;
+
+            if (r1 != r2 || c1 != c2)
+            {
+                cout << RED << "\n[Error] Subtraction requires matrices of the exact same size!\n"
+                     << RESET;
+                break;
+            }
+
+            Matrix<double> A(r1, c1), B(r2, c2);
+            cout << "\nInput Matrix A:";
+            cin >> A;
+            cout << "\nInput Matrix B:";
+            cin >> B;
+
+            cout << GREEN << "\n********* SUBTRACTION RESULT **********" << RESET;
+            cout << A - B;
+            break;
+        }
+
+        case 3: // SCALAR MULTIPLICATION
+        {
+            int r1, c1;
+            double s;
+            cout << "\n\033[36m=== SCALAR MULTIPLICATION ===\033[0m\n";
+            cout << "Size of Matrix A (row,col): ";
+            cin >> r1 >> ch >> c1;
+
+            Matrix<double> A(r1, c1);
+            cout << "\nInput Matrix A:";
+            cin >> A;
+
+            cout << "\nEnter Scalar multiplier: ";
+            cin >> s;
+
+            cout << GREEN << "\n*********** SCALAR RESULT ***********" << RESET;
+            cout << (A * s);
+            break;
+        }
+
+        case 4: // MATRIX MULTIPLICATION
+        {
+            int r1, c1, r2, c2;
+            cout << "\n\033[36m=== MATRIX MULTIPLICATION ===\033[0m\n";
+            cout << "Size of Matrix A (row,col): ";
+            cin >> r1 >> ch >> c1;
+            cout << "Size of Matrix B (row,col): ";
+            cin >> r2 >> ch >> c2;
+
+            // Fail-Fast Validation: Catch impossible math before they type inputs!
+            if (c1 != r2)
+            {
+                cout << RED << "\n[Math Error] Matrix A columns (" << c1 << ") must equal Matrix B rows (" << r2 << ")!\n"
+                     << RESET;
+                break;
+            }
+
+            Matrix<double> A(r1, c1), B(r2, c2);
+            cout << "\nInput Matrix A:";
+            cin >> A;
+            cout << "\nInput Matrix B:";
+            cin >> B;
+
+            cout << GREEN << "\n***** MATRIX MULTIPLICATION RESULT *****" << RESET;
+            cout << (A * B);
+            break;
+        }
+
+        case 5: // TRANSPOSE
+        {
+            int r1, c1;
+            cout << "\n\033[36m=== TRANSPOSE ===\033[0m\n";
+            cout << "Size of Matrix (row,col): ";
+            cin >> r1 >> ch >> c1;
+
+            Matrix<double> A(r1, c1);
+            cout << "\nInput Matrix:";
+            cin >> A;
+
+            cout << GREEN << "\n******** TRANSPOSE RESULT ********" << RESET;
+            cout << A.transpose();
+            break;
+        }
+
+        case 6: // ROW ECHELON FORM
+        {
+            int r1, c1;
+            cout << "\n\033[36m=== ROW ECHELON FORM (REF) ===\033[0m\n";
+            cout << "Size of Matrix (row,col): ";
+            cin >> r1 >> ch >> c1;
+
+            Matrix<double> A(r1, c1);
+            cout << "\nInput Matrix:";
+            cin >> A;
+
+            A.ref(); // Modify the matrix
+            cout << GREEN << "\n********** REF RESULT **********" << RESET;
+            cout << A;
+            break;
+        }
+
+        case 7: // SOLVE SYSTEM
+        {
+            int n;
+            cout << "\n\033[35m=== SOLVE LINEAR SYSTEM (A*x = B) ===\033[0m\n";
+            cout << "Note: The coefficient matrix 'A' must be square.\n";
+            cout << "Enter the number of variables/equations (n): ";
+            cin >> n;
+
+            Matrix<double> A(n, n);
+            Vector<double> B(n);
+
+            cout << "\nInput Coefficient Matrix A (" << n << "x" << n << "):";
+            cin >> A;
+
+            cout << "\nInput Constants Vector B (" << n << " elements):";
+            cin >> B;
+
+            Vector<double> solution = A.solveSystem(B);
 
             if (solution.getrow() > 0)
             {
@@ -820,7 +818,7 @@ int main()
             break;
         }
 
-        case 8:
+        case 8: // TRANSFORMATION PIPELINE
         {
             cout << "\n\033[35m=== 2D TRANSFORMATION PIPELINE ===\033[0m\n";
 
@@ -833,10 +831,8 @@ int main()
             TransformPipeline<double> pipe(2);
             int pipeChoice;
 
-            cout << "\n"
-                 << GREEN << "Target Vector created at (" << point[0] << ", " << point[1] << ")" << RESET << "\n";
+            cout << GREEN << "\nTarget Vector created at (" << point[0] << ", " << point[1] << ")" << RESET << "\n";
 
-            // Mini-menu for building the pipeline
             do
             {
                 cout << "\n--- Add Transformation ---\n";
@@ -889,13 +885,13 @@ int main()
             break;
         }
 
-        case 9:
+        case 9: // EXIT
             cout << CYAN << "\nExiting LINA-CLI... Goodbye!\n\n"
                  << RESET;
             break;
 
         default:
-            cout << RED << "Invalid choice! Please select from the menu.\n"
+            cout << RED << "\n[Error] Invalid choice! Please select from the menu.\n"
                  << RESET;
         }
 
