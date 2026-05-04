@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <fstream>
 using namespace std;
 
 #define RESET "\033[0m"
@@ -136,56 +137,63 @@ public:
             return os;
 
         int width = 8;
-        
+
         // Calculate the required inner width (1 space left padding + data + 1 space right padding)
         int total = (m.ncol * width) + 2;
 
         // Ensure the box is at least wide enough to fit the "FINAL MATRIX" title (12 chars)
-        if (total < 14) {
-            total = 14; 
+        if (total < 14)
+        {
+            total = 14;
         }
 
         // 1. Top Border
         os << "\n+";
-        for (int i = 0; i < total; i++) os << "-";
+        for (int i = 0; i < total; i++)
+            os << "-";
         os << "+\n";
 
         // 2. Title Row (Calculates left/right spaces mathematically to prevent odd/even bugs)
         os << "|";
         int leftSpace = (total - 12) / 2;
-        int rightSpace = total - 12 - leftSpace; 
-        
-        for (int i = 0; i < leftSpace; i++) os << " ";
+        int rightSpace = total - 12 - leftSpace;
+
+        for (int i = 0; i < leftSpace; i++)
+            os << " ";
         os << "FINAL MATRIX";
-        for (int i = 0; i < rightSpace; i++) os << " ";
+        for (int i = 0; i < rightSpace; i++)
+            os << " ";
         os << "|\n";
 
         // 3. Middle Border
         os << "+";
-        for (int i = 0; i < total; i++) os << "-";
+        for (int i = 0; i < total; i++)
+            os << "-";
         os << "+\n";
 
         // 4. Data Rows
         for (int i = 0; i < m.nrow; i++)
         {
             os << "| "; // Left padding (1 space)
-            
+
             for (int j = 0; j < m.ncol; j++)
             {
                 os << setw(width) << m.matx[i][j];
             }
-            
-            // Fill any remaining space on the right side 
+
+            // Fill any remaining space on the right side
             // (Crucial for 1x1 matrices where the title is wider than the data)
             int remainingSpace = total - (m.ncol * width) - 1;
-            for (int j = 0; j < remainingSpace; j++) os << " ";
-            
+            for (int j = 0; j < remainingSpace; j++)
+                os << " ";
+
             os << "|\n";
         }
 
         // 5. Bottom Border
         os << "+";
-        for (int i = 0; i < total; i++) os << "-";
+        for (int i = 0; i < total; i++)
+            os << "-";
         os << "+\n";
 
         return os;
@@ -621,16 +629,55 @@ public:
         return masterTransform * targetVector;
     }
 };
+// ==========================================
+// FILE HANDLING UTILITY
+// ==========================================
+template <typename T>
+void promptSave(const Matrix<T> &m, const string &operationName)
+{
+    char choice;
+    cout << "\nDo you want to save this result to a file? (Y/N): ";
+    cin >> choice;
 
-// ==========================================
-// MAIN FUNCTION
-// ==========================================
+    if (choice == 'Y' || choice == 'y')
+    {
+        string filename;
+        cout << "Enter filename (e.g., output.txt) or type 'log' to use default history: ";
+        cin >> filename;
+
+        // Route 'log' to a standard history file
+        if (filename == "log")
+        {
+            filename = "lina_history.txt";
+        }
+
+        // ios::app ensures we APPEND to the file instead of overwriting it!
+        ofstream outFile(filename, ios::app);
+
+        if (outFile.is_open())
+        {
+            outFile << "\n=== " << operationName << " ===\n";
+            outFile << m; // Writes your beautiful formatted matrix directly to the text file!
+            outFile << "\n";
+
+            outFile.close();
+            cout << GREEN << "[Success] Result successfully appended to " << filename << "!\n"
+                 << RESET;
+        }
+        else
+        {
+            cout << RED << "[Error] Could not open or create the file.\n"
+                 << RESET;
+        }
+    }
+}
+
 // ==========================================
 // MAIN FUNCTION (Production CLI Flow)
 // ==========================================
 int main()
 {
-    char ch; // Used to catch the comma in inputs like "2,2"
+    char ch;
     int choice;
 
     cout << "\n\033[34m+=======================================================+\033[0m\n";
@@ -678,8 +725,12 @@ int main()
             cout << "\nInput Matrix B:";
             cin >> B;
 
+            Matrix<double> sum = A + B;
             cout << GREEN << "\n*********** ADDITION RESULT ***********" << RESET;
-            cout << A + B;
+            cout << sum;
+
+            // File Save Trigger
+            promptSave(sum, "Addition Result");
             break;
         }
 
@@ -705,8 +756,11 @@ int main()
             cout << "\nInput Matrix B:";
             cin >> B;
 
+            Matrix<double> diff = A - B;
             cout << GREEN << "\n********* SUBTRACTION RESULT **********" << RESET;
-            cout << A - B;
+            cout << diff;
+
+            promptSave(diff, "Subtraction Result");
             break;
         }
 
@@ -725,8 +779,11 @@ int main()
             cout << "\nEnter Scalar multiplier: ";
             cin >> s;
 
+            Matrix<double> result = A * s;
             cout << GREEN << "\n*********** SCALAR RESULT ***********" << RESET;
-            cout << (A * s);
+            cout << result;
+
+            promptSave(result, "Scalar Multiplication Result");
             break;
         }
 
@@ -739,7 +796,6 @@ int main()
             cout << "Size of Matrix B (row,col): ";
             cin >> r2 >> ch >> c2;
 
-            // Fail-Fast Validation: Catch impossible math before they type inputs!
             if (c1 != r2)
             {
                 cout << RED << "\n[Math Error] Matrix A columns (" << c1 << ") must equal Matrix B rows (" << r2 << ")!\n"
@@ -753,8 +809,11 @@ int main()
             cout << "\nInput Matrix B:";
             cin >> B;
 
+            Matrix<double> product = A * B;
             cout << GREEN << "\n***** MATRIX MULTIPLICATION RESULT *****" << RESET;
-            cout << (A * B);
+            cout << product;
+
+            promptSave(product, "Matrix Multiplication Result");
             break;
         }
 
@@ -769,8 +828,11 @@ int main()
             cout << "\nInput Matrix:";
             cin >> A;
 
+            Matrix<double> t = A.transpose();
             cout << GREEN << "\n******** TRANSPOSE RESULT ********" << RESET;
-            cout << A.transpose();
+            cout << t;
+
+            promptSave(t, "Transposed Matrix");
             break;
         }
 
@@ -785,9 +847,11 @@ int main()
             cout << "\nInput Matrix:";
             cin >> A;
 
-            A.ref(); // Modify the matrix
+            A.ref();
             cout << GREEN << "\n********** REF RESULT **********" << RESET;
             cout << A;
+
+            promptSave(A, "Row Echelon Form");
             break;
         }
 
@@ -814,6 +878,7 @@ int main()
             {
                 cout << GREEN << "\n********** SOLUTION VECTOR (x) **********" << RESET;
                 cout << solution;
+                promptSave(solution, "Linear System Solution (x)");
             }
             break;
         }
@@ -882,6 +947,8 @@ int main()
 
             cout << GREEN << "\n********** FINAL TRANSFORMED COORDINATE **********" << RESET;
             cout << transformedPoint;
+
+            promptSave(transformedPoint, "Pipeline Transformed Coordinate");
             break;
         }
 
