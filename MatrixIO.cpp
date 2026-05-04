@@ -185,6 +185,42 @@ public:
             }
         }
     }
+    // --- V1.5 RECOVERED FEATURE: DETERMINANT ---
+    Matrix<T> getMinor(int excludeRow, int excludeCol) const {
+        Matrix<T> minorMat(nrow - 1, ncol - 1);
+        int r = 0;
+        for (int i = 0; i < nrow; i++) {
+            if (i == excludeRow) continue; // Skip the crossed-out row
+            int c = 0;
+            for (int j = 0; j < ncol; j++) {
+                if (j == excludeCol) continue; // Skip the crossed-out column
+                minorMat.matx[r][c] = this->matx[i][j];
+                c++;
+            }
+            r++;
+        }
+        return minorMat;
+    }
+
+    double determinant() const {
+        if (nrow != ncol) throw std::invalid_argument("Determinant is only defined for square matrices!");
+        if (nrow == 1) return (double)matx[0][0];
+        if (nrow == 2) return (double)((matx[0][0] * matx[1][1]) - (matx[0][1] * matx[1][0]));
+
+        double det = 0.0;
+        int sign = 1;
+        
+        // Recursively calculate sub-determinants across the top row
+        for (int f = 0; f < ncol; f++) {
+            Matrix<T> minorMat = getMinor(0, f);
+            det += sign * (double)matx[0][f] * minorMat.determinant();
+            sign = -sign; // Alternating signs (+ - + -)
+        }
+        
+        // Clean up floating point dust
+        if (std::abs(det) < 1e-9) return 0.0;
+        return det;
+    }
 
     // --- V1.5 FEATURE: RANK ---
     int rank() const
@@ -526,7 +562,7 @@ int main()
                  << BOLD << "========= MAIN MENU =========" << RESET << "\n";
             cout << "1. Matrix Arithmetics (+, -, *)\n";
             cout << "2. Transpose Matrix\n";
-            cout << "3. Advanced Properties (Inverse, Rank, Independence) " << RESET << "\n";
+            cout << "3. Advanced Properties (Inverse, Rank, Independence,Determinate) " << RESET << "\n";
             cout << "4. Row Echelon Form (REF)\n";
             cout << "5. Solve Linear Systems (Ax = B)\n";
             cout << "6. Matrix Transformation (2D Pipeline) " << RESET << "\n";
@@ -645,9 +681,9 @@ int main()
             case 3: // ADVANCED PROPERTIES (V1.5)
             {
                 int advChoice;
-                cout << "\n"
-                     << BOLD << "--- Advanced Properties ---" << RESET << "\n";
-                cout << "1. Calculate Rank\n2. Gauss-Jordan Inverse\n3. Check Linear Independence\nSelect: ";
+                cout << "\n" << BOLD << "--- Advanced Properties ---" << RESET << "\n";
+                // UPDATE THIS MENU TEXT
+                cout << "1. Calculate Rank\n2. Gauss-Jordan Inverse\n3. Check Linear Independence\n4. Calculate Determinant\nSelect: ";
                 cin >> advChoice;
 
                 if (advChoice == 1)
@@ -694,6 +730,16 @@ int main()
                         cout << RED << "Conclusion: Vectors are Linearly DEPENDENT.\n"
                              << RESET;
                     }
+                }
+                else if (advChoice == 4) {
+                    int r1, c1;
+                    cout << "Size of Matrix (rows cols): "; cin >> r1 >> c1;
+                    Matrix<double> A(r1, c1); 
+                    cout << "\nInput Matrix:"; cin >> A;
+                    
+                    double det = A.determinant();
+                    cout << CYAN << "\n********** DETERMINANT **********" << RESET;
+                    cout << GREEN << "\n|A| = " << det << RESET << "\n";
                 }
                 break;
             }

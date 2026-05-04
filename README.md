@@ -1,28 +1,38 @@
-# LINA-CLI: Matrix Operation System 🧮
+# LINA-CLI: Academic Matrix Operation System 🧮
 
-LINA-CLI is a professional-grade, interactive Command-Line Interface designed for high-performance linear algebra operations. Built as a foundational tool for AI and Machine Learning computation, it features memory-safe architecture, persistent file logging, and advanced matrix transformations.
+LINA-CLI (v1.5) is a professional-grade, interactive Command-Line Interface designed for high-performance linear algebra operations. Originally built as a foundational tool for AI and Machine Learning computation, it has been expanded into a comprehensive academic engine covering Matrix Algebra, Vector Spaces, and Linear Transformations.
 
-## 🚀 Features
+## 🚀 Version 1.5 Features
 
-### Core Mathematical Engine
-* **Standard Operations:** Matrix Addition, Subtraction, and Scalar Multiplication.
-* **Matrix Multiplication:** Strict validation for N x M and M x P dot products.
-* **Transposition:** Instantly transpose any N x M matrix.
-* **Template Optimization:** Fully templated `Matrix` and `Vector` classes seamlessly support floating-point (`double`) calculations to prevent integer truncation during complex division.
+### 1. Matrix Algebra & Systems
+* **Core Operations:** Matrix Addition, Subtraction, and Matrix/Scalar Multiplication.
+* **Gauss-Jordan Inverse:** Calculates the true inverse ($A^{-1}$) of any square matrix using algorithmic augmented matrix reduction.
+* **Row Echelon Form (REF):** Algorithmic reduction for matrix simplification.
+* **Gaussian Elimination:** Solves complex systems of linear equations ($Ax = B$) dynamically.
+* **Transposition:** Instantly transpose any $N \times M$ matrix.
 
-### Advanced AI/ML & Physics Algorithms
-* **Gaussian Elimination:** Solve complex systems of linear equations (Ax = B) dynamically.
-* **Row Echelon Form (REF):** Algorithmic reduction for rank identification and matrix simplification.
-* **2D Transformation Pipeline:** A dedicated graphics/physics engine pipeline to chain Scale, Rotate, and Reflect transformations into a single Master Matrix, applied to coordinate vectors.
+### 2. Vector Spaces & Properties
+* **Rank Calculation:** Programmatically determines the rank of a matrix to reveal the true dimension of datasets.
+* **Linear Independence Verification:** Analyzes sets of $R^n$ vectors via Rank-Nullity logic to determine if they are linearly independent or dependent.
 
-### Production-Grade Architecture
-* **Memory Safety:** Built entirely on C++ `std::vector`, ensuring zero memory leaks and utilizing RAII principles (no manual `new`/`delete` pointers).
-* **Exception Handling:** Robust `try-catch` architecture intercepts fatal math errors (e.g., division by zero, singular matrices, dimension mismatches) and safely aborts operations without crashing the engine.
-* **Data Persistence:** Integrated File I/O allows users to append complex calculations and ASCII-formatted results to `lina_history.txt` for continuous logging and external software interoperability.
+### 3. 2D Transformation Pipeline (Graphics/Physics)
+A dedicated pipeline to chain geometric transformations into a single Master Matrix, applied to coordinate vectors:
+* **Scale** (Expansion/Contraction)
+* **Rotate**
+* **Reflect** (Across X or Y axes)
+* **Shear**
+* **Projection** (Collapse to X or Y axes)
 
-## 🛠️ Compilation & Installation
+## 🛠️ Production-Grade Architecture
 
-LINA-CLI requires a standard C++ compiler (like GCC/G++).
+* **Memory Safety:** Built entirely on C++ `std::vector`, ensuring zero memory leaks and utilizing strict RAII principles (no manual `new`/`delete` pointers).
+* **Bulletproof Input Handling:** Custom `std::cin` flushing prevents infinite loops and crashes from bad user inputs (e.g., typing chars instead of ints).
+* **Exception Handling:** Robust `try-catch` architecture intercepts fatal math errors (division by zero, singular matrices, dimension mismatches) and safely aborts operations.
+* **Data Persistence:** Integrated File I/O automatically appends complex calculations and ASCII-formatted results to `lina_history.txt`, with an in-app log viewer for continuous tracking.
+
+## ⚙️ Compilation & Installation
+
+LINA-CLI requires a standard C++11 (or higher) compiler (like GCC/G++).
 
 1. Clone the repository:
    ```bash
@@ -30,7 +40,8 @@ LINA-CLI requires a standard C++ compiler (like GCC/G++).
    cd lina-cli
    ```
 2. Compile the source code:
-   ```bash
+   
+```bash
    g++ MatrixIO.cpp -o lina_cli
    ```
 3. Run the engine:
@@ -42,24 +53,15 @@ LINA-CLI requires a standard C++ compiler (like GCC/G++).
 Upon launching, the interactive menu guides you through operations with fail-fast validation. 
 ```text
 ========= MAIN MENU =========
-1. Addition
-2. Subtraction
-3. Scalar Multiplication
-4. Matrix Multiplication
-5. Transpose
-6. Row Echelon Form (REF)
-7. Solve Linear Systems (Ax = B)
-8. Matrix Transformation (2D Pipeline)
-9. Exit
+1. Matrix Arithmetics (+, -, *)
+2. Transpose Matrix
+3. Advanced Properties (Inverse, Rank, Independence)
+4. Row Echelon Form (REF)
+5. Solve Linear Systems (Ax = B)
+6. Matrix Transformation (2D Pipeline)
+7. View Operation Log
+8. Exit
 ```
 
-**File Logging:** After any calculation, LINA-CLI will prompt:
-`Do you want to save this result to a file? (Y/N):`
-Typing `log` automatically routes the beautifully formatted ASCII matrix output directly to your continuous history file.
-
-## 🗺️ Roadmap (Future Implementations)
-* **File Input Integration:** Read large-scale N x N weight/bias matrices directly from `.csv` or `.json` files for ML algorithm feeding.
-* **3D Transformation Pipeline:** Expand the geometric pipeline to handle 3D space (X, Y, Z) and homogenous coordinates for translation matrices.
-
 ## 🤝 Contributing
-Contributions, issues, and feature requests are welcome!
+Contributions, issues, and feature requests are welcome! Ideal future implementations include File Input Integration (reading `.csv` matrices) and Eigenvalue/Eigenvector calculators.
