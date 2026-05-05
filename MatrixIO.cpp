@@ -22,6 +22,17 @@ using namespace std;
 #define BLUE "\033[34m"
 #define MAGENTA "\033[35m"
 #define CYAN "\033[36m"
+#define NEON_GREEN "\033[38;5;46m"
+#define ELECTRIC_BLUE "\033[38;5;51m"
+#define LASER_RED "\033[38;5;196m"
+#define MATRIX_GREEN "\033[38;5;40m"
+#define STEEL_GRAY "\033[38;5;245m"
+#define CYBER_PURPLE "\033[38;5;129m"
+#define IRON_BLUE   "\033[38;2;70;130;180m"
+#define NEON_PINK   "\033[38;2;255;20;147m"
+#define TOXIC_GREEN "\033[38;2;57;255;20m"
+#define DARK_CORE   "\033[38;2;30;30;30m"
+#define GOLD_CORE   "\033[38;2;255;215;0m"
 
 // ==========================================
 // TEMPLATE MATRIX CLASS
@@ -559,7 +570,7 @@ int main()
         try
         {
             cout << "\n\n"
-                 << YELLOW << "========= MAIN MENU =========" << RESET << "\n";
+                 << ELECTRIC_BLUE << "========= MAIN MENU =========" << RESET << "\n";
             cout << "1. Matrix Arithmetics (+, -, *)\n";
             cout << "2. Transpose Matrix\n";
             cout << "3. Advanced Properties (Inverse, Rank, Independence,Determinate) " << RESET << "\n";
@@ -586,16 +597,16 @@ int main()
             {
                 int arithChoice;
                 cout << "\n"
-                     << BOLD << "--- Matrix Arithmetics ---" << RESET << "\n";
-                cout << "1. Addition\n2. Subtraction\n3. Multiplication\nSelect: ";
-                cin >> arithChoice;
+                     <<IRON_BLUE<< BOLD << "--- Matrix Arithmetics ---" << RESET << "\n";
+                cout << CYBER_PURPLE << "1. Addition\n2. Subtraction\n3. Multiplication\n" <<RESET<<"Select : ";
+                 cin>> arithChoice;
 
                 if (arithChoice == 1 || arithChoice == 2)
                 {
                     int r1, c1, r2, c2;
                     cout << "Size of Matrix A ("<<YELLOW <<"rows cols): "<<RESET;
                     cin >> r1 >> c1;
-                    cout << "Size of Matrix B (rows cols): ";
+                    cout << "Size of Matrix B (" << YELLOW << "rows cols): " << RESET;
                     cin >> r2 >> c2;
                     if (r1 != r2 || c1 != c2)
                         throw std::invalid_argument("Size mismatch!");
@@ -630,7 +641,7 @@ int main()
                     {
                         int r1, c1;
                         double s;
-                        cout << "Size of Matrix A (rows cols): ";
+                        cout << "Size of Matrix A (" << YELLOW << "rows cols): " << RESET;
                         cin >> r1 >> c1;
                         Matrix<double> A(r1, c1);
                         cout << "\nInput Matrix A:";
@@ -645,9 +656,9 @@ int main()
                     else if (multChoice == 2)
                     {
                         int r1, c1, r2, c2;
-                        cout << "Size of Matrix A (rows cols): ";
+                        cout << "Size of Matrix A (" << YELLOW << "rows cols): " << RESET;
                         cin >> r1 >> c1;
-                        cout << "Size of Matrix B (rows cols): ";
+                        cout << "Size of Matrix B (" << YELLOW << "rows cols): " << RESET;
                         cin >> r2 >> c2;
                         if (c1 != r2)
                             throw std::invalid_argument("Matrix A cols must equal Matrix B rows!");
@@ -667,7 +678,7 @@ int main()
             case 2: // TRANSPOSE
             {
                 int r1, c1;
-                cout << "\n\033[36m=== TRANSPOSE ===\033[0m\nSize of Matrix (rows cols): ";
+                cout << "\n\033[36m=== TRANSPOSE ===\033[0m\nSize of Matrix (" << YELLOW << "rows cols): " << RESET;
                 cin >> r1 >> c1;
                 Matrix<double> A(r1, c1);
                 cout << "\nInput Matrix:";
@@ -681,7 +692,7 @@ int main()
             case 3: // ADVANCED PROPERTIES (V1.5)
             {
                 int advChoice;
-                cout << "\n" << BOLD << "--- Advanced Properties ---" << RESET << "\n";
+                cout << "\n" <<CYBER_PURPLE << "--- Advanced Properties ---" << RESET << "\n";
                 // UPDATE THIS MENU TEXT
                 cout << "1. Calculate Rank\n2. Gauss-Jordan Inverse\n3. Check Linear Independence\n4. Calculate Determinant\nSelect: ";
                 cin >> advChoice;
@@ -689,7 +700,7 @@ int main()
                 if (advChoice == 1)
                 {
                     int r1, c1;
-                    cout << "Size of Matrix (rows cols): ";
+                    cout << "Size of Matrix (" << YELLOW << "rows cols): " << RESET;
                     cin >> r1 >> c1;
                     Matrix<double> A(r1, c1);
                     cout << "\nInput Matrix:";
@@ -700,7 +711,7 @@ int main()
                 else if (advChoice == 2)
                 {
                     int r1, c1;
-                    cout << "Size of Matrix (rows cols): ";
+                    cout << "Size of Matrix (" << YELLOW << "rows cols): " << RESET;
                     cin >> r1 >> c1;
                     Matrix<double> A(r1, c1);
                     cout << "\nInput Matrix:";
@@ -746,7 +757,7 @@ int main()
             case 4: // REF
             {
                 int r1, c1;
-                cout << "\n\033[36m=== ROW ECHELON FORM (REF) ===\033[0m\nSize of Matrix (rows cols): ";
+                cout << "\n\033[36m=== ROW ECHELON FORM (REF) ===\033[0m\nSize of Matrix (" << YELLOW << "rows cols): " << RESET;
                 cin >> r1 >> c1;
                 Matrix<double> A(r1, c1);
                 cout << "\nInput Matrix:";
@@ -776,7 +787,7 @@ int main()
             }
             case 6: // TRANSFORMATION PIPELINE
             {
-                cout << "\n\033[35m=== 2D TRANSFORMATION PIPELINE ===\033[0m\n";
+                cout << NEON_GREEN<<"\n=== 2D TRANSFORMATION PIPELINE ===\n"<<RESET;
                 Vector<double> point(2);
                 cout << "Enter the X coordinate: ";
                 cin >> point[0];
