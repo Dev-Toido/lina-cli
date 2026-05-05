@@ -559,7 +559,7 @@ int main()
         try
         {
             cout << "\n\n"
-                 << BOLD << "========= MAIN MENU =========" << RESET << "\n";
+                 << YELLOW << "========= MAIN MENU =========" << RESET << "\n";
             cout << "1. Matrix Arithmetics (+, -, *)\n";
             cout << "2. Transpose Matrix\n";
             cout << "3. Advanced Properties (Inverse, Rank, Independence,Determinate) " << RESET << "\n";
@@ -575,7 +575,7 @@ int main()
 
             if (choice == 8)
             {
-                cout << CYAN << "\nExiting LINA-CLI... Goodbye!\n\n"
+                cout << GREEN << "\nExiting LINA-CLI... Goodbye!\n\n"
                      << RESET;
                 break;
             }
@@ -593,7 +593,7 @@ int main()
                 if (arithChoice == 1 || arithChoice == 2)
                 {
                     int r1, c1, r2, c2;
-                    cout << "Size of Matrix A (rows cols): ";
+                    cout << "Size of Matrix A ("<<YELLOW <<"rows cols): "<<RESET;
                     cin >> r1 >> c1;
                     cout << "Size of Matrix B (rows cols): ";
                     cin >> r2 >> c2;
